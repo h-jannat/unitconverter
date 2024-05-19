@@ -23,10 +23,13 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.example.unitconverter.ui.theme.UnitConverterTheme
 
@@ -74,10 +77,37 @@ fun UnitConverter() {
             })
         Row {
             val context = LocalContext.current
-            var isExpanded = false;
-            DropDown(buttonText = "From")
+            var isFromDropdownExpanded by remember {
+                mutableStateOf(false)
+            }
+
+            fun setIsFromDropdownExpanded() {
+                println("setIsFromDropdownExpanded : $isFromDropdownExpanded")
+                isFromDropdownExpanded = !isFromDropdownExpanded
+            }
+
+
+            var isToDropdownExpanded by remember {
+                mutableStateOf(false)
+            }
+
+            fun setIsToDropdownExpanded() {
+                println("setIsFromDropdownExpanded clicked")
+                isToDropdownExpanded = !isToDropdownExpanded
+            }
+            DropDown(
+                buttonText = "From",
+                isFromDropdownExpanded,
+                ::setIsFromDropdownExpanded
+            )
+
+
             Spacer(modifier = Modifier.width(Dp(10f)))
-            DropDown(buttonText = "To")
+            DropDown(
+                buttonText = "To",
+                isToDropdownExpanded,
+                ::setIsToDropdownExpanded
+            )
         }
         Text(text = "Result = ")
 
@@ -85,18 +115,28 @@ fun UnitConverter() {
 }
 
 @Composable
-fun DropDown(buttonText: String) {
+fun DropDown(
+    buttonText: String, isExpanded: Boolean,
+    setIsExpanded: () -> (Unit) = {}
+
+) {
 
     Box() {
-        Button(onClick = { }) {
+        Button(
+            onClick = setIsExpanded
+
+        ) {
             Text(text = buttonText)
             Icon(
                 Icons.Default.ArrowDropDown,
                 contentDescription = "arrow down"
             )
         }
-        DropdownMenu(expanded = true, onDismissRequest = {
-        }) {
+        DropdownMenu(expanded = isExpanded,
+            onDismissRequest
+            = {
+                setIsExpanded()
+            }) {
             listOf("cm", "m", "C", "F").map {
                 DropdownMenuItem(
                     text = { Text(it) },
@@ -106,10 +146,3 @@ fun DropDown(buttonText: String) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun UnitConverterPreview() {
-    UnitConverterTheme {
-        UnitConverter()
-    }
-}
