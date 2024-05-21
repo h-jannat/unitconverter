@@ -31,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import com.example.unitconverter.ui.theme.UnitConverterTheme
 import kotlin.math.pow
@@ -74,11 +73,25 @@ fun UnitConverter() {
             "mm" to 10F.pow(3), "cm" to 10F.pow(2),
             "m" to 1F, "Km" to 10F.pow(-3)
         )
+        var isFromDropdownExpanded: Boolean by remember {
+            mutableStateOf(false)
+        }
+        var fromUnit: String? by remember {
+            mutableStateOf(null)
+        }
+        var isToDropdownExpanded by remember {
+            mutableStateOf(false)
+        }
+        var toUnit: String? by remember {
+            mutableStateOf(null)
+        }
         Text(
-            text = "UnitConverter", modifier = Modifier.padding(
+            text = "Unit Converter",
+            modifier = Modifier.padding(
                 bottom = Dp
-                    (16f)
-            )
+                    (30f)
+            ),
+            style = MaterialTheme.typography.headlineMedium,
         )
         OutlinedTextField(
             modifier = Modifier.padding(
@@ -88,30 +101,18 @@ fun UnitConverter() {
             value = if (inputValue == null) "" else inputValue.toString(),
             onValueChange
             = {
-                inputValue = it.toFloat()
+                inputValue = it.toFloatOrNull()
 
             })
         Row {
-            val context = LocalContext.current
-            var isFromDropdownExpanded: Boolean by remember {
-                mutableStateOf(false)
-            }
-            var fromUnit: String? by remember {
-                mutableStateOf(null)
-            }
-            var isToDropdownExpanded by remember {
-                mutableStateOf(false)
-            }
-            var toUnit: String? by remember {
-                mutableStateOf(null)
-            }
 
             fun convert() {
                 if (fromUnit != null && unitsMap[toUnit] != null && inputValue !=
                     null
                 ) {
                     val factor =
-                        unitsMap[toUnit]?.div(unitsMap[fromUnit]!!) as Float
+                        unitsMap[toUnit]?.div(unitsMap[fromUnit]!!) as
+                                Float
                     result = inputValue!! * factor
                 }
             }
@@ -141,7 +142,11 @@ fun UnitConverter() {
                 }
             )
         }
-        Text(text = "Result = ${if (result != null) result else ""} ")
+        Text(
+            text = "Result= ${result ?: ""} ${toUnit ?: ""}",
+            modifier = Modifier.padding(vertical = Dp(20F)),
+            style = MaterialTheme.typography.headlineSmall
+        )
 
     }
 }
